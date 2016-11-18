@@ -1,0 +1,7 @@
+[package]
+name = "chat-mio"
+version = "0.1.0"
+authors = ["Jim Blandy <jimb@red-bean.com>"]
+
+[dependencies]
+mio = { git = "file:///home/jimb/rust/mio" }
