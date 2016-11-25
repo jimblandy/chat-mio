@@ -91,24 +91,21 @@ fn main() {
                             Ok(0) => {
                                 println!("got eof");
                                 connection = None;
+                                break;
                             }
-                            Ok(_) => {
-                                stdout.write_all(&buf)
-                                    .and_then(|()| stdout.flush())
-                                    .expect("failed to write received string");
-                                println!("\x07");
-                            }
+                            Ok(_) => (),
                             Err(e) => {
-                                stdout.write_all(&buf)
-                                    .and_then(|()| stdout.flush())
-                                    .expect("failed to write received string");
-                                println!("\x07");
-                                if e.kind() == std::io::ErrorKind::WouldBlock {
-                                    break;
+                                if e.kind() != std::io::ErrorKind::WouldBlock {
+                                    panic!("error reading from connection: {:?}", e);
                                 }
-                                panic!("error reading from connection: {:?}", e);
                             }
                         }
+
+                        print!("\x07");
+                        stdout.write_all(&buf)
+                            .and_then(|()| stdout.flush())
+                            .expect("failed to write received string");
+
                     }
                 }
                 Token(_) => panic!("unexpected token")
