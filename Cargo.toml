@@ -4,4 +4,4 @@ version = "0.1.0"
 authors = ["Jim Blandy <jimb@red-bean.com>"]
 
 [dependencies]
-mio = { git = "file:///home/jimb/rust/mio" }
+mio = "0.6.1"
