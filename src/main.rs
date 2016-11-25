@@ -21,7 +21,7 @@ fn to_addr(addr: &str) -> SocketAddr {
 fn main() {
     let mut args = std::env::args().skip(1);
 
-    let mut poll = Poll::new().expect("couldn't create mio::Poll");
+    let poll = Poll::new().expect("couldn't create mio::Poll");
 
     let mut listener = None;
     let mut connection = None;
@@ -59,7 +59,7 @@ fn main() {
                     let listener = listener.take().unwrap();
                     let (stream, peer) = listener.accept().expect("accepting incoming connection");
                     poll.deregister(&listener).expect("deregistering listening socket");
-                    println!("Accepting connection from {:?}", peer);
+                    println!("Accepting connection from {:?}\x07", peer);
                     poll.register(&stream, CONNECTION, Ready::readable(), PollOpt::level())
                         .expect("failed to register inbound connection with mio poll");
                     connection = Some(stream);
@@ -95,12 +95,14 @@ fn main() {
                             Ok(_) => {
                                 stdout.write_all(&buf)
                                     .and_then(|()| stdout.flush())
-                                    .expect("failed to write received string")
+                                    .expect("failed to write received string");
+                                println!("\x07");
                             }
                             Err(e) => {
                                 stdout.write_all(&buf)
                                     .and_then(|()| stdout.flush())
                                     .expect("failed to write received string");
+                                println!("\x07");
                                 if e.kind() == std::io::ErrorKind::WouldBlock {
                                     break;
                                 }
