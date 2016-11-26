@@ -86,27 +86,23 @@ fn main() {
                 }
                 CONNECTION => {
                     let mut buf = Vec::new();
-                    while connection.is_some() {
-                        match connection.as_mut().unwrap().read_to_end(&mut buf) {
-                            Ok(0) => {
-                                println!("got eof");
-                                connection = None;
-                                break;
-                            }
-                            Ok(_) => (),
-                            Err(e) => {
-                                if e.kind() != std::io::ErrorKind::WouldBlock {
-                                    panic!("error reading from connection: {:?}", e);
-                                }
+                    match connection.as_mut().unwrap().read_to_end(&mut buf) {
+                        Ok(0) => {
+                            println!("got eof");
+                            connection = None;
+                        }
+                        Ok(_) => (),
+                        Err(e) => {
+                            if e.kind() != std::io::ErrorKind::WouldBlock {
+                                panic!("error reading from connection: {:?}", e);
                             }
                         }
-
-                        print!("\x07");
-                        stdout.write_all(&buf)
-                            .and_then(|()| stdout.flush())
-                            .expect("failed to write received string");
-
                     }
+
+                    print!("\x07");
+                    stdout.write_all(&buf)
+                        .and_then(|()| stdout.flush())
+                        .expect("failed to write received string");
                 }
                 Token(_) => panic!("unexpected token")
             }
